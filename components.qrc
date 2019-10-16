@@ -1,0 +1,34 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Components/Button.qml</file>
+        <file>Components/Label.qml</file>
+        <file>Components/Controller.qml</file>
+        <file>Components/Switch.qml</file>
+        <file>Components/TextField.qml</file>
+        <file>Components/Container.qml</file>
+        <file>Components/Center.qml</file>
+        <file>Components/Select.qml</file>
+	<file>Components/AppCustom.qml</file>
+        <file>Components/App.qml</file>
+        <file>Components/Tabs.qml</file>
+	<file>Components/TabsView.qml</file>
+        <file>Utilitaries/Tabone.qml</file>
+        <file>Utilitaries/Tabtwo.qml</file>
+        <file>Components/TabRepeater.qml</file>
+        <file>Components/TabContent.qml</file>
+        <file>Components/Card.qml</file>
+        <file>Components/Slide.qml</file>
+        <file>Components/ProgressBar.qml</file>
+        <file>Components/fontawesome-free-5.0.10/web-fonts-with-css/webfonts/fa-brands-400.svg</file>
+        <file>Components/fontawesome-free-5.0.10/web-fonts-with-css/webfonts/fa-regular-400.svg</file>
+        <file>Components/fontawesome-free-5.0.10/web-fonts-with-css/webfonts/fa-solid-900.svg</file>
+        <file>Components/fontawesome-free-5.0.10/web-fonts-with-css/webfonts/fa-brands-400.ttf</file>
+        <file>Components/fontawesome-free-5.0.10/web-fonts-with-css/webfonts/fa-regular-400.ttf</file>
+        <file>Components/fontawesome-free-5.0.10/web-fonts-with-css/webfonts/fa-solid-900.ttf</file>
+        <file>Components/fontawesome-free-5.0.10/web-fonts-with-css/webfonts/fa-brands-400.woff</file>
+        <file>Components/fontawesome-free-5.0.10/web-fonts-with-css/webfonts/fa-regular-400.woff</file>
+        <file>Components/fontawesome-free-5.0.10/web-fonts-with-css/webfonts/fa-solid-900.woff</file>
+        <file>Components/ProgressBar.qml</file>
+        <file>Components/WindowDecoration.qml</file>
+    </qresource>
+</RCC>
