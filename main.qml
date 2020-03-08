@@ -8,11 +8,11 @@ import "./Components"
 AppCustom {
     id: bg
     title: "Wallpaper"
-    x: (Screen.desktopAvailableWidth / 2) - (920 / 2)
-    y: (Screen.desktopAvailableHeight / 2) - (600 / 2)
+    x: (Screen.desktopAvailableWidth / 2) - (width / 2)
+    y: (Screen.desktopAvailableHeight / 2) - (height / 2)
     width: 920
     height: 600
-    flags: Qt.FramelessWindowHint
+    flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowSystemMenuHint
     color: "transparent"
 
     property string bgColor: "#161616"
@@ -23,17 +23,25 @@ AppCustom {
     }
 
     MouseArea {
+        id: mouseBg
         anchors.fill: parent
         anchors.margins: 2
+        enabled: false
 
         property int initialX: 0
 
         onPressed: {
             initialX = mouseX
+            cursorShape = Qt.SizeAllCursor
+        }
+
+        onReleased: {
+            cursorShape = Qt.ArrowCursor
         }
 
         onMouseXChanged: {
             bg.x = Context.mouseX() - initialX
+            Context.windowMove(bg.x, bg.y, bg.width, bg.height)
         }
 
         onMouseYChanged: {
@@ -42,13 +50,33 @@ AppCustom {
             } else {
                 bg.y = Context.mouseY() - 2
             }
+            Context.windowMove(bg.x, bg.y, bg.width, bg.height)
         }
+
+        /*
+        property var clickPos: "1, 1"
+        property int bgX: bg.x
+        property int bgY: bg.y
+
+        onPressed: {
+            cursorShape = Qt.SizeAllCursor
+            clickPos = Qt.point(mouse.x, mouse.y)
+        }
+
+        onPositionChanged: {
+            var delta = Qt.point(mouse.x - clickPos.x, mouse.y - clickPos.y)
+            //bg.x += delta.x
+            //bg.y += delta.y
+            bgX += delta.x
+            bgY += delta.y
+            Context.windowMove(bgX, bgY, bg.width, bg.height)
+        }*/
     }
 
     Rectangle {
         anchors.fill: parent
         color: bgColor
-        opacity: 0.92
+        opacity: 0.94
     }
 
     Image {
@@ -58,10 +86,12 @@ AppCustom {
     }
 
     Rectangle {
+        id: graidArea
         anchors.fill: parent
         color: "transparent"
 
         Rectangle {
+            id: subArea
             x: 10
             y: 35
             width: parent.width - 20
@@ -74,13 +104,6 @@ AppCustom {
                     return {img: arg}
                 }
 
-                //            Component.onCompleted: {
-                //                var imgs = Context.backgrouds(main.path)
-                //                for (var i = 0; i < imgs.length; i++) {
-                //                    append(createListElement(imgs[i]))
-                //                }
-                //            }
-
                 function reload() {
                     clear()
                     var imgs = Context.backgrouds(path)
@@ -89,19 +112,6 @@ AppCustom {
                     }
                 }
             }
-
-            /*
-            Component {
-                 id: highlight
-                 Rectangle {
-                     width: gridView.cellWidth; height: gridView.cellHeight
-                     color: "lightsteelblue"; radius: 5
-                     x: gridView.currentItem.x
-                     y: gridView.currentItem.y
-                     Behavior on x { SpringAnimation { spring: 3; damping: 0.2 } }
-                     Behavior on y { SpringAnimation { spring: 3; damping: 0.2 } }
-                 }
-             }*/
 
             GridView {
                 id: gridView
@@ -132,16 +142,16 @@ AppCustom {
                             height: parent.height - 10
                             source: "image://pixmap/" + img
                             anchors.horizontalCenter: parent.horizontalCenter
-                            antialiasing: true
+                            antialiasing: false
                             fillMode: Image.PreserveAspectCrop
                             asynchronous: true
-                            smooth: true
+                            smooth: false
+                            cache: true
                             property string url: img
 
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
-                                    //main.imageBg.source = img
                                     Context.backgroundChange(img)
                                 }
                             }
@@ -155,7 +165,6 @@ AppCustom {
                 cellHeight: 100
             }
         }
-
     }
 
     Rectangle {
@@ -182,11 +191,19 @@ AppCustom {
         size: 18
         color: "#999"
         font.family: "Font Awesome 5 Free"
-
         MouseArea {
             anchors.fill: parent
+            hoverEnabled: true
+            onHoveredChanged: {
+                cursorShape = Qt.PointingHandCursor
+            }
+            onExited: {
+                cursorShape = Qt.ArrowCursor
+            }
             onClicked: {
+                fileDialog.setFolder("file://" + path)
                 fileDialog.open()
+                //Context.windowMove()
             }
         }
     }
@@ -199,41 +216,46 @@ AppCustom {
         size: 18
         color: "#999"
         font.family: "Font Awesome 5 Free"
-
         MouseArea {
             anchors.fill: parent
+            hoverEnabled: true
+            onHoveredChanged: {
+                cursorShape = Qt.PointingHandCursor
+            }
+            onExited: {
+                cursorShape = Qt.ArrowCursor
+            }
             onClicked: {
                 bg.close()
             }
         }
     }
 
-
     FileDialog {
         id: fileDialog
         width: 800
         height: 480
         title: "Selecione uma pasta"
-        folder: path
+        folder: "file://" + path
         selectFolder: true
-
+        modality: Qt.NonModal
         onAccepted: {
             path = fileDialog.folder.toString().replace('file://', '')
             Context.backgroundPath(path)
             listModel.reload()
-            gridView1.model = listModel
+            gridView.model = listModel
 
-            //load.visible = true
-            //time.start()
             if (width > 400 || height > 400) {
                 time.start()
             }
-            //console.log("You chose: " + fileDialog.fileUrls, fileDialog.folder)
         }
         onRejected: {
             //console.log("Canceled")
         }
-        //Component.onCompleted: visible = true
+        Component.onCompleted: {
+            width = 800
+            height = 480
+        }
     }
 
 
@@ -243,8 +265,7 @@ AppCustom {
         interval: 3000
         onTriggered: {
             load.visible = false
-            //load.deleteLater()
-            //load.destroy()
+            mouseBg.enabled = true
         }
     }
 
@@ -274,7 +295,6 @@ AppCustom {
     }
 
     Component.onCompleted: {
-
         var pos = Context.positions()
         x = pos[0]
         y = pos[1]

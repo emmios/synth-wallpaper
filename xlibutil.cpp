@@ -6,6 +6,44 @@ Xlibutil::Xlibutil()
 
 }
 
+int Xlibutil::xwindowMove(Window window, int x, int y, int w, int h)
+{
+    Display *d = XOpenDisplay(0);
+    //XMoveWindow(d, window, x, y);
+    //XResizeWindow(d, window, 770, 600);
+    //XMoveResizeWindow(d, window, x, y, 600, 600);
+    //XSetWindowBorderWidth(d, window, 8);
+    //XMapWindow(d, window);
+
+    if (y < 0) y = 0;
+
+    Status status;
+    XEvent xevent;
+    Atom moveresize;
+
+    moveresize = XInternAtom(d, "_NET_MOVERESIZE_WINDOW", False);
+    if (!moveresize)
+    {
+        return -1;
+    }
+
+    xevent.type = ClientMessage;
+    xevent.xclient.window = window;
+    xevent.xclient.message_type = moveresize;
+    xevent.xclient.format = 32;
+    xevent.xclient.data.l[0] = StaticGravity | (1 << 8) | (1 << 9) | (1 << 10) | (1 << 11);
+    xevent.xclient.data.l[1] = x;
+    xevent.xclient.data.l[2] = y;
+    xevent.xclient.data.l[3] = w;
+    xevent.xclient.data.l[4] = h;
+
+    status = XSendEvent(d, DefaultRootWindow(d), False,
+                SubstructureNotifyMask | SubstructureRedirectMask, &xevent);
+
+    XCloseDisplay(d);
+    return status;
+}
+
 QString Xlibutil::xgetWindowFocused()
 {
     Window w;

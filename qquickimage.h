@@ -27,7 +27,7 @@ public:
 
            if (!pixel.isNull())
            {
-               pixel = pixel.scaled(180, 120, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+               pixel = pixel.scaled(140, 100, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
            }
        }
 

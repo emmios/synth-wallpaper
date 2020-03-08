@@ -48,6 +48,7 @@ public:
     void xaddDesktopFile(int pid, QString arg);
     QPixmap xwindowIcon(Window window);
     XWindowAttributes attrWindow(Display *display, Window window);
+    int xwindowMove(Window window, int x, int y, int w, int h);
     void resizeWindow(Display *display, Window window, int x, int y, unsigned int w, unsigned int h);
     void xwindowClose(Window window);
     void xchangeProperty(Window window, const char * atom, const char * internalAtom, int format);

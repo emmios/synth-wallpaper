@@ -23,7 +23,7 @@
 #include <QWindow>
 #include <QProcess>
 #include <QSettings>
-
+#include <QX11Info>
 
 #include "xlibutil.h"
 
@@ -44,8 +44,9 @@ public:
     Q_INVOKABLE int mouseX();
     Q_INVOKABLE int mouseY();
     Q_INVOKABLE QStringList positions();
+    Q_INVOKABLE void windowMove(int x, int y, int w, int h);
     Q_INVOKABLE void positions(int x, int y, int w, int h);
-    //QWindow *window;
+    QWindow *window;
     QQmlApplicationEngine *engine;
 
 private:

@@ -1,11 +1,15 @@
 #include "context.h"
 
+void Context::windowMove(int x, int y, int w, int h)
+{
+    util.xwindowMove(window->winId(), x, y, w, h);
+}
 
 QString Context::getImgBackground()
 {
     QDir dir;
-    QString path = dir.homePath() + "/.config/Synth/desktop/";
-    QSettings settings(path + "settings.txt", QSettings::NativeFormat);
+    QString path = dir.homePath() + "/.config/synth/desktop/";
+    QSettings settings(path + "settings.conf", QSettings::NativeFormat);
     return settings.value("background").toString();
 }
 
@@ -82,24 +86,24 @@ void Context::backgroundChange(QString bg)
     }
 
     QDir dir;
-    QString path = dir.homePath() + "/.config/Synth/desktop/";
-    QSettings settings(path + "settings.txt", QSettings::NativeFormat);
+    QString path = dir.homePath() + "/.config/synth/desktop/";
+    QSettings settings(path + "settings.conf", QSettings::NativeFormat);
     settings.setValue("background", bg);
 }
 
 void Context::backgroundPath(QString bg)
 {
     QDir dir;
-    QString path = dir.homePath() + "/.config/Synth/desktop/";
-    QSettings settings(path + "settings.txt", QSettings::NativeFormat);
+    QString path = dir.homePath() + "/.config/synth/desktop/";
+    QSettings settings(path + "settings.conf", QSettings::NativeFormat);
     settings.setValue("path", bg);
 }
 
 QString Context::backgroundPath()
 {
     QDir dir;
-    QString path = dir.homePath() + "/.config/Synth/desktop/";
-    QSettings settings(path + "settings.txt", QSettings::NativeFormat);
+    QString path = dir.homePath() + "/.config/synth/desktop/";
+    QSettings settings(path + "settings.conf", QSettings::NativeFormat);
     path = settings.value("path").toString();
     if (path.isEmpty()) path = "/usr/share/backgrounds/";
     return path;
@@ -119,8 +123,8 @@ void Context::allDesktop()
 void Context::positions(int x, int y, int w, int h)
 {
     QDir dir;
-    QString path = dir.homePath() + "/.config/Synth/desktop/";
-    QSettings settings(path + "settings.txt", QSettings::NativeFormat);
+    QString path = dir.homePath() + "/.config/synth/desktop/";
+    QSettings settings(path + "settings.conf", QSettings::NativeFormat);
     settings.beginGroup("wallpaper");
     settings.setValue("x", x);
     settings.setValue("y", y);
@@ -133,8 +137,8 @@ QStringList Context::positions()
 {
     QStringList pos;
     QDir dir;
-    QString path = dir.homePath() + "/.config/Synth/desktop/";
-    QSettings settings(path + "settings.txt", QSettings::NativeFormat);
+    QString path = dir.homePath() + "/.config/synth/desktop/";
+    QSettings settings(path + "settings.conf", QSettings::NativeFormat);
     settings.beginGroup("wallpaper");
     pos << settings.value("x").toString();
     pos << settings.value("y").toString();
