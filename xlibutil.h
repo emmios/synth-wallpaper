@@ -46,7 +46,9 @@ public:
     unsigned char* windowProperty(Display *display, Window window, const char *arg, unsigned long *nitems, int *status);
     QString xwindowLauncher(Window window);
     void xaddDesktopFile(int pid, QString arg);
-    QPixmap xwindowIcon(Window window);
+    Atom atom(const char* atomName);
+    QPixmap xwindowScreenShot(Window window, bool argb = false);
+    QPixmap xwindowIcon(Window window, QSize size, bool smooth = false);
     XWindowAttributes attrWindow(Display *display, Window window);
     int xwindowMove(Window window, int x, int y, int w, int h);
     void resizeWindow(Display *display, Window window, int x, int y, unsigned int w, unsigned int h);

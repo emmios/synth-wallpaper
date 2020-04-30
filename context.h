@@ -24,11 +24,13 @@
 #include <QProcess>
 #include <QSettings>
 #include <QX11Info>
+#include <QBuffer>
+#include <QImage>
 
 #include "xlibutil.h"
 
 
-class Context : public QObject
+class Context : public QObject, public Xlibutil
 {
 
     Q_OBJECT
@@ -46,6 +48,7 @@ public:
     Q_INVOKABLE QStringList positions();
     Q_INVOKABLE void windowMove(int x, int y, int w, int h);
     Q_INVOKABLE void positions(int x, int y, int w, int h);
+    Q_INVOKABLE QString blurEffect(QVariant obj, int screeshot = 1);
     QWindow *window;
     QQmlApplicationEngine *engine;
 

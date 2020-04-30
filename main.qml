@@ -7,15 +7,15 @@ import "./Components"
 
 AppCustom {
     id: bg
-    title: "Wallpaper"
+    title: "Synth Wallpaper"
     x: (Screen.desktopAvailableWidth / 2) - (width / 2)
     y: (Screen.desktopAvailableHeight / 2) - (height / 2)
-    width: 920
-    height: 600
+    width: 860
+    height: 543
     flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowSystemMenuHint
-    color: "transparent"
+    color: "#00000000"
 
-    property string bgColor: "#161616"
+    //property string bgColor: "#333"
     property string path: Context.backgroundPath()//"/usr/share/backgrounds/"
 
     onClosing: {
@@ -37,6 +37,7 @@ AppCustom {
 
         onReleased: {
             cursorShape = Qt.ArrowCursor
+            //blureffect.source = Context.blurEffect(bg, 0)
         }
 
         onMouseXChanged: {
@@ -73,16 +74,41 @@ AppCustom {
         }*/
     }
 
+    /*
+    Timer {
+        id: blurTimer
+        running: false
+        interval: 1000
+        repeat: false
+        onTriggered: {
+            blureffect.source = Context.blurEffect(bg, 0)
+        }
+    }
+
+    BlurEffect {
+        id: blureffect
+        visible: false
+    }*/
+
     Rectangle {
         anchors.fill: parent
-        color: bgColor
-        opacity: 0.94
+        color: "#fff"
+        opacity: 0.96
     }
 
     Image {
         anchors.fill: parent
-        source: "qrc:/Resources/noise.png"
+        source: "/Resources/noise.png"
         opacity: 0.1
+    }
+
+    Text {
+        id: titulo
+        y: 6
+        x: (bg.width / 2) - (titulo.width / 2)
+        text: "Synth Wallpaper"
+        font.pixelSize: 12
+        color: "#333"
     }
 
     Rectangle {
@@ -101,14 +127,14 @@ AppCustom {
             ListModel {
                 id: listModel
                 function createListElement(arg) {
-                    return {img: arg}
+                    return {img: arg.split(",")}
                 }
 
                 function reload() {
                     clear()
                     var imgs = Context.backgrouds(path)
                     for (var i = 0; i < imgs.length; i++) {
-                        append(createListElement(imgs[i]))
+                        append({thumb: imgs[i].split(",")[0],img: imgs[i].split(",")[1]})
                     }
                 }
             }
@@ -129,6 +155,9 @@ AppCustom {
                 interactive: true
                 anchors.fill: parent
                 clip: true
+                cacheBuffer: 300
+                cellWidth: 140
+                cellHeight: 100
                 //antialiasing: false
                 model: []
 
@@ -140,19 +169,30 @@ AppCustom {
                         Image {
                             width: parent.width - 10
                             height: parent.height - 10
-                            source: "image://pixmap/" + img
+                            source: thumb //"image://pixmap/" + img
                             anchors.horizontalCenter: parent.horizontalCenter
-                            antialiasing: false
-                            fillMode: Image.PreserveAspectCrop
+                            antialiasing: true
+                            fillMode: Image.Tile
                             asynchronous: true
-                            smooth: false
+                            smooth: true
                             cache: true
-                            property string url: img
 
                             MouseArea {
                                 anchors.fill: parent
+                                hoverEnabled: true
+                                onHoveredChanged: {
+                                    cursorShape = Qt.PointingHandCursor
+                                }
+                                onPressed: {
+                                    cursorShape = Qt.ArrowCursor
+                                }
+                                onReleased: {
+                                    cursorShape = Qt.ArrowCursor
+                                }
                                 onClicked: {
                                     Context.backgroundChange(img)
+                                    //blurTimer.stop()
+                                    //blurTimer.start()
                                 }
                             }
                         }
@@ -160,9 +200,6 @@ AppCustom {
                         spacing: 10
                     }
                 }
-
-                cellWidth: 150
-                cellHeight: 100
             }
         }
     }
@@ -180,6 +217,7 @@ AppCustom {
             height: 250
             source: "qrc:/icons/loading.gif"
             asynchronous: true
+            smooth: true
             cache: false
         }
     }
@@ -189,7 +227,7 @@ AppCustom {
         x: 14
         text: '\uf07c'
         size: 18
-        color: "#999"
+        color: "#333"
         font.family: "Font Awesome 5 Free"
         MouseArea {
             anchors.fill: parent
@@ -214,7 +252,7 @@ AppCustom {
         x: bg.width - 22
         text: '\uf00d'
         size: 18
-        color: "#999"
+        color: "#333"
         font.family: "Font Awesome 5 Free"
         MouseArea {
             anchors.fill: parent
@@ -240,14 +278,11 @@ AppCustom {
         selectFolder: true
         modality: Qt.NonModal
         onAccepted: {
-            path = fileDialog.folder.toString().replace('file://', '')
-            Context.backgroundPath(path)
-            listModel.reload()
-            gridView.model = listModel
-
-            if (width > 400 || height > 400) {
-                time.start()
-            }
+            load.visible = true
+            mouseBg.enabled = false
+            path = fileDialog.folder.toString().replace('file://', '') 
+            time.stop()
+            time.start()
         }
         onRejected: {
             //console.log("Canceled")
@@ -258,12 +293,14 @@ AppCustom {
         }
     }
 
-
     Timer {
         id: time
         running: false
-        interval: 3000
+        interval: 1000
         onTriggered: {
+            Context.backgroundPath(path)
+            listModel.reload()
+            gridView.model = listModel
             load.visible = false
             mouseBg.enabled = true
         }
@@ -287,11 +324,15 @@ AppCustom {
     onWidthChanged: {
         orientation.stop()
         orientation.start()
+        //blurTimer.stop()
+        //blurTimer.start()
     }
 
     onHeightChanged: {
         orientation.stop()
         orientation.start()
+        //blurTimer.stop()
+        //blurTimer.start()
     }
 
     Component.onCompleted: {
@@ -300,12 +341,6 @@ AppCustom {
         y = pos[1]
         width = pos[2]
         height = pos[3]
-
-        if (width <= 400 || height <= 400) {
-            load.visible = false
-        } else {
-            time.start()
-        }
 
         if (width - height >= height) {
             gridView.flow = GridView.FlowTopToBottom
@@ -317,5 +352,8 @@ AppCustom {
 
         listModel.reload()
         gridView.model = listModel
+        //blureffect.source = Context.blurEffect(bg, 0)
+        load.visible = false
+        mouseBg.enabled = true
     }
 }

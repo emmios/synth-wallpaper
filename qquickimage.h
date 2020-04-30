@@ -23,11 +23,12 @@ public:
        {
            QString img = id;
            if (img.contains("file:///")) img = img.replace("file://", "");
-           pixel.load(img);
+           pixel.load(img, "jpg");
 
            if (!pixel.isNull())
            {
-               pixel = pixel.scaled(140, 100, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+               //pixel = pixel.scaled(140, 100, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+               pixel = pixel.scaled(140, 100, Qt::IgnoreAspectRatio);
            }
        }
 

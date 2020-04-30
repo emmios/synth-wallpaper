@@ -1,5 +1,57 @@
 #include "context.h"
 
+
+QString Context::blurEffect(QVariant obj, int screeshot)
+{
+    Window desktop = -1;
+
+    if (screeshot == 1)
+    {
+        unsigned long items;
+        Window *list = this->xwindows(&items);
+        for (int i = 0; i < items; i++)
+        {
+            QString type = this->xwindowType(list[i]);
+            if (type == "_NET_WM_WINDOW_TYPE_DESKTOP")
+            {
+                desktop = list[i];
+                break;
+            }
+        }
+    }
+    else
+    {
+        desktop = 0;
+    }
+
+    if (desktop != -1)
+    {
+        QPixmap map;
+        QScreen *screen = QGuiApplication::primaryScreen();
+        if (!obj.isNull())
+        {
+            QObject *_obj = obj.value<QObject *>();
+            if (_obj)
+            {
+                QWindow *win = qobject_cast<QWindow *>(_obj);
+                map = screen->grabWindow(desktop, win->x(), win->y(), win->width(), win->height());
+            }
+        }
+        if (!map.isNull())
+        {
+            QBuffer buffer;
+            buffer.open(QIODevice::ReadWrite);
+            map.save(&buffer, "jpg");
+            const QByteArray bytes = buffer.buffer();
+            buffer.close();
+            QString base64("data:image/jpg;base64,");
+            base64.append(QString::fromLatin1(bytes.toBase64().data()));
+            return base64;
+        }
+    }
+    return "";
+}
+
 void Context::windowMove(int x, int y, int w, int h)
 {
     util.xwindowMove(window->winId(), x, y, w, h);
@@ -53,14 +105,35 @@ int Context::mouseY()
 QStringList Context::backgrouds(QString path)
 {
     QDir dir(path);
+    QString tmp = dir.homePath() + "/.config/synth/desktop/wallpaper/thumbs";
     QStringList lista;
 
     for (QFileInfo info : dir.entryInfoList(QDir::Files | QDir::NoDot | QDir::NoDotAndDotDot))
     {
         QString name = info.fileName().toLower();
-        if (name.contains(".jpg") || name.contains(".png") || name.contains(".jpeg") || name.contains(".mp4"))
+        if (name.contains(".jpg") || name.contains(".png") || name.contains(".jpeg"))
         {
-            lista << "file://" + info.absoluteFilePath();
+            dir.mkpath(tmp + info.absolutePath());
+            QString imgTemp = tmp + info.absolutePath() + "/" + info.fileName() + "-" + info.suffix() + ".jpg";
+            QFile file(imgTemp);
+            file.open(QFile::ReadOnly);
+
+            if (!file.exists())
+            {
+                QImage image(info.absoluteFilePath());
+                if (!image.isNull())
+                {
+                    image = image.scaled(140, 100, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+                    if (image.save(imgTemp, "jpg"))
+                    {
+                        lista << "file://" + imgTemp + ",file://" + info.absoluteFilePath();
+                    }
+                }
+            }
+            else
+            {
+                lista << "file://" + imgTemp + ",file://" + info.absoluteFilePath();
+            }
         }
     }
 
